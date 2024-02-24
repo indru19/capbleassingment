@@ -1,0 +1,60 @@
+import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+
+const schema = yup.object().shape({
+  username: yup.string().required('Username is required'),
+  email: yup.string().email('Invalid email').required('Email is required'),
+  password: yup.string().required('Password is required'),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref('password'), null], 'Passwords must match')
+    .required('Confirm Password is required'),
+  // You can add more validation for optional fields like name and profile picture
+});
+
+const Signup = () => {
+  const { register, handleSubmit, errors } = useForm({
+    resolver: yupResolver(schema),
+  });
+  const [successMessage, setSuccessMessage] = useState('');
+  const history = useHistory();
+
+  const onSubmit = (data) => {
+    // Simulate API call to register user
+    // On success, set success message and redirect to posts
+    setSuccessMessage('Signup successful. Welcome!');
+    setTimeout(() => {
+      history.push('/posts');
+    }, 2000);
+  };
+
+  return (
+    <div className="flex justify-center items-center h-screen">
+      <form onSubmit={handleSubmit(onSubmit)} className="max-w-md w-full px-4">
+        <h2 className="text-2xl font-bold mb-4">Sign Up</h2>
+        <input type="text" name="username" ref={register} placeholder="Username" className="input" />
+        {errors.username && <p className="error">{errors.username.message}</p>}
+        <input type="text" name="email" ref={register} placeholder="Email" className="input" />
+        {errors.email && <p className="error">{errors.email.message}</p>}
+        <input type="password" name="password" ref={register} placeholder="Password" className="input" />
+        {errors.password && <p className="error">{errors.password.message}</p>}
+        <input type="password" name="confirmPassword" ref={register} placeholder="Confirm Password" className="input" />
+        {errors.confirmPassword && <p className="error">{errors.confirmPassword.message}</p>}
+        {/* Additional optional fields here */}
+        <div className="flex items-center mb-4">
+          <input type="checkbox" name="terms" ref={register} className="mr-2" />
+          <label htmlFor="terms">I agree to the terms and conditions</label>
+        </div>
+        <button type="submit" className="btn">
+          Sign Up
+        </button>
+        {successMessage && <p className="success mt-2">{successMessage}</p>}
+      </form>
+    </div>
+  );
+};
+
+export default Signup;
